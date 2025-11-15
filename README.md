@@ -1,0 +1,2 @@
+# Financial-Risk-Mitigation-Customer-Retention-A-Power-BI-Churn-Analysis
+This project delivers a interactive dashboard built in Power BI, designed to financial institution understand, quantify, and proactively reduce customer attrition. Using a granular customer data snapshot, the dashboard moves stakeholders from a simple metric to actionable intervention strategies by identifying high-risk segments and individuals.
