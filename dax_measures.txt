@@ -1,0 +1,80 @@
+// ====================================================================
+// CORE CUSTOMER COUNTS
+// These form the foundation (denominator) for all rate calculations.
+// ====================================================================
+
+Total Customers =
+COUNTROWS('Churn_Modelling')
+
+Churned Customers =
+CALCULATE(
+[Total Customers],
+'Churn_Modelling'[Exited] = 1
+// Assuming 1 is used for 'Churned' before Power Query text conversion
+)
+
+// ====================================================================
+// FINANCIAL MEASURES (FOR PAGE 1)
+// ====================================================================
+
+Total Lost Balance =
+CALCULATE(
+SUM('Churn_Modelling'[Balance]),
+'Churn_Modelling'[Exited] = 1
+)
+// NOTE: Use this measure for the KPI card on the Executive Summary page.
+
+// ====================================================================
+// RATE MEASURES (THE MAIN KPIS)
+// Format this measure as a Percentage (0.00%).
+// ====================================================================
+
+Churn Rate =
+DIVIDE(
+[Churned Customers],
+[Total Customers]
+)
+
+// ====================================================================
+// AVG STATS FOR CONTEXT (FOR PAGE 3)
+// ====================================================================
+
+Avg Credit Score Churned =
+CALCULATE(
+AVERAGE('Churn_Modelling'[CreditScore]),
+'Churn_Modelling'[Exited] = 1
+)
+
+// ====================================================================
+// WHAT-IF ANALYSIS MEASURES (FOR PAGE 3/STRATEGY PAGE)
+// NOTE: These link to the 'Retention Investment' Parameter Slicer.
+// Assumption: For every $100,000 invested, we save 0.5% of the lost balance.
+// ====================================================================
+
+Projected Churn Reduction % =
+DIVIDE(
+'Retention Investment'[Retention Investment Value],
+100000
+) * 0.005
+
+Projected Balance Saved =
+[Total Lost Balance] * [Projected Churn Reduction %]
+
+// ====================================================================
+// CALCULATED COLUMN: Churn Risk Score
+// NOTE: This must be created as a NEW COLUMN in the main data table, not a Measure.
+// The code below assumes 'IsActiveMember' is still in its raw INTEGER format (0/1).
+// ====================================================================
+
+/*
+Churn Risk Score =
+VAR TenureRisk = IF('Churn_Modelling'[Tenure] < 3, 0.4, 0)
+
+VAR ProductRisk = IF('Churn_Modelling'[NumOfProducts] = 1, 0.3, 0)
+
+VAR InactiveRisk = IF('Churn_Modelling'[IsActiveMember] = 0, 0.2, 0)
+
+VAR HighBalanceRisk = IF('Churn_Modelling'[Balance] > 120000, 0.1, 0)
+
+RETURN TenureRisk + ProductRisk + InactiveRisk + HighBalanceRisk
+*/
